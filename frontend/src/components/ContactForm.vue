@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { ref, watch } from 'vue';
 import { userFormStore } from '../stores/formStore';
+import axios from 'axios';
 
 const formStore = userFormStore();
 
@@ -12,13 +13,23 @@ watch(name, (newVal) => formStore.setName(newVal));
 watch(email, (newVal) => formStore.setEmail(newVal));
 watch(message, (newVal) => formStore.setMessage(newVal));
 
-const submitForm = () =>{
-    alert(`Дякуємо, ${formStore.name}! Ваше повідомлення отримано.`)
-    formStore.resetForm();
+const submitForm = async() =>{
+    try{
+        const response = await axios.post('http://localhost:8080/api/contact',{
+            name: formStore.name,
+            email: formStore.email,
+            message: formStore.message,
+        });
 
-    name.value ='';
-    email.value = '';
-    message.value ='';
+        alert(`Дякуємо, ${formStore.name}! Ваше повідомлення отримано.`);
+        formStore.resetForm();
+        name.value ='';
+        email.value ='';
+        message.value ='';
+    }catch (error){
+        alert('Виникла помилка при відправці форми. Спробуйте пізніше');
+        console.log(error);
+    }
 }
 </script>
 <template>

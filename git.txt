@@ -1,0 +1,4 @@
+git checkout -b feature/vue-setup
+git add .
+git commit -m "Ініціалізація Vue 3 + TypeScript проєкту, простий шаблон"
+git push -u origin feature/vue-setup

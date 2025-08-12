@@ -35,7 +35,7 @@ public class LeadController {
     }
 
     @GetMapping
-    public ResponseEntity<Page<LeadDTO>> lesit(
+    public ResponseEntity<Page<LeadDTO>> list(
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size
     ){

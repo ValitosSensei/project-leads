@@ -11,4 +11,7 @@ public interface LeadService {
     Page<LeadDTO> getLeads(Pageable pageable);
     LeadDTO getLeadById(Long id);
     void deleteLead(Long id);
+    Page<LeadDTO> searchByName(String name, Pageable pageable);
+    Page<LeadDTO> searchByType(String typeOfWork, Pageable pageable);
+    Page<LeadDTO> searchByPhone(String phone, Pageable pageable);
 }

@@ -45,6 +45,29 @@ public class LeadServiceImpl  implements  LeadService{
     public void deleteLead(Long id) {
         leadRepository.deleteById(id);
     }
+
+    @Override
+    public Page<LeadDTO> searchByName(String name, Pageable pageable) {
+        return leadRepository.findByNameContainingIgnoreCase(name,pageable)
+                .map(this::mapToDTO);
+    }
+
+    @Override
+    public Page<LeadDTO> searchByType(String typeOfWork, Pageable pageable) {
+        return leadRepository.findByTypeOfWorkContainingIgnoreCase(typeOfWork,pageable)
+                .map(this::mapToDTO);
+    }
+
+    @Override
+    public Page<LeadDTO> searchByPhone(String phone, Pageable pageable) {
+        return  leadRepository.findByPhoneContaining(phone,pageable).map(this::mapToDTO);
+    }
+
+    public Page<LeadDTO> searchByNameAndTypeOfWork(String name,String typeOfWork ,Pageable pageable) {
+    return leadRepository
+            .findByNameContainingIgnoreCaseAndTypeOfWorkContainingIgnoreCase(name,typeOfWork,pageable).map(this::mapToDTO);
+    }
+
     //Мапування дто в ліда
     private Lead mapToEntity(LeadDTO dto) {
         Lead l =  new Lead();

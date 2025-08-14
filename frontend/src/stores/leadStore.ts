@@ -10,7 +10,6 @@ export interface Lead {
     createdAt: string;
 }
 
-const token = 'eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJWYWxpdG9zIiwicm9sZXMiOlsiUk9MRV9BRE1JTiJdLCJpYXQiOjE3NTUxNzYzMzcsImV4cCI6MTc1NTE3OTkzN30.zQc0Am7Vt80WpYngRo76hYH1Xs5C8YXSfneKJl8mwMSq5_eWWt_ESgWHZg2HK8IRWY7WTJycF7WjZfdsISHQVA'
 
 export const useLeadStore = defineStore('leadStore', {
     state: () => ({
@@ -19,9 +18,7 @@ export const useLeadStore = defineStore('leadStore', {
     actions: {
         async fetchLeads() {
             try {
-                const response = await axios.get('http://localhost:8080/api/leads', {
-                    headers: { Authorization: `Bearer ${token}` }
-                });
+                const response = await axios.get('http://localhost:8080/api/leads');
                 this.leads = response.data.content;
             } catch (error) {
                 console.error('Помилка при отримані лідів', error);
@@ -29,9 +26,7 @@ export const useLeadStore = defineStore('leadStore', {
         },
         async deleteLead(id: number) {
             try {
-                await axios.delete(`http://localhost:8080/api/leads/${id}`, {
-                    headers: { Authorization: `Bearer ${token}` }
-                });
+                await axios.delete(`http://localhost:8080/api/leads/${id}`);
                 this.leads = this.leads.filter(lead => lead.id !== id);
             } catch (error) {
                 console.error('Помилка при видаленні ліда:', error);
@@ -39,13 +34,11 @@ export const useLeadStore = defineStore('leadStore', {
         },
         async searchLeads(params: { name?: string; typeOfWork?: string }) {
             try {
-                let url = 'http://localhost:8080/api/leads/search?';
-                if (params.name) url += `name=${params.name}&`;
-                if (params.typeOfWork) url += `typeOfWork=${params.typeOfWork}&`;
+                let query = new URLSearchParams();
+                if (params.name) query.append('name', params.name);
+                if (params.typeOfWork) query.append('typeOfWork', params.typeOfWork);
 
-                const response = await axios.get(url, {
-                    headers: { Authorization: `Bearer ${token}` }
-                });
+                const response = await axios.get(`http://localhost:8080/api/leads/search?${query.toString()}`);
                 this.leads = response.data.content;
             } catch (error) {
                 console.error('Помилка при пошуку лідів:', error);

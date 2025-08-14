@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import AdminPanel from './components/AdminPanel.vue';
 import ContactForm from './components/ContactForm.vue';
 
 </script>
@@ -6,6 +7,7 @@ import ContactForm from './components/ContactForm.vue';
 <template>
  <h1>Привіт, Валитос! Це перший Vue 3 + TypeScript проект</h1>
  <ContactForm/>
+ <AdminPanel/>
 </template>
 
 <style scoped>

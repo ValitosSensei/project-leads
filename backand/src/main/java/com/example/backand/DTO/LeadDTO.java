@@ -6,6 +6,8 @@ import lombok.Data;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.time.LocalDateTime;
+
 @Data
 public class LeadDTO {
     private Long id;
@@ -23,5 +25,7 @@ public class LeadDTO {
 
     @Size(max = 2000)
     private String comment;
+
+    private LocalDateTime createdAt;
 
 }

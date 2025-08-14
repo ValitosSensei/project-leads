@@ -85,6 +85,7 @@ public class LeadServiceImpl  implements  LeadService{
         dto.setPhone(lead.getPhone());
         dto.setTypeOfWork(lead.getTypeOfWork());
         dto.setComment(lead.getComment());
+        dto.setCreatedAt(lead.getCreatedAt());
         return dto;
     }
 }

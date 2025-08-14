@@ -1,42 +1,69 @@
 <script setup lang="ts">
-import { ref, watch } from 'vue';
-import { userFormStore } from '../stores/formStore';
 import axios from 'axios';
+import { reactive, ref } from 'vue';
 
-const formStore = userFormStore();
+interface LeadDTO{
+  name:string;
+  phone:string;
+  typeOfWork?:string;
+  comment?:string;
+}
 
-const name = ref(formStore.name);
-const email = ref(formStore.email);
-const message = ref(formStore.message);
+const lead = reactive<LeadDTO>({
+  name:'',
+  phone:'',
+  typeOfWork:'',
+  comment:'',
+})
 
-watch(name, (newVal) => formStore.setName(newVal));
-watch(email, (newVal) => formStore.setEmail(newVal));
-watch(message, (newVal) => formStore.setMessage(newVal));
+const errors = reactive<{name?: string; phone?:string}>({})
+const message  =ref('');
 
-const submitForm = async() =>{
-    try{
-        const response = await axios.post('http://localhost:8080/api/contact',{
-            name: formStore.name,
-            email: formStore.email,
-            message: formStore.message,
-        });
+const validate = ()  =>{
+  errors.name = lead.name.trim() ? '':'Ім’я обов’язкове';
+  errors.phone = /^\d{5,30}$/.test(lead.phone) ? '': 'Телефон повинен містити від 5 до 30 цифр';
+  return !errors.name && !errors.phone;
+}
 
-        alert(`Дякуємо, ${formStore.name}! Ваше повідомлення отримано.`);
-        formStore.resetForm();
-        name.value ='';
-        email.value ='';
-        message.value ='';
-    }catch (error){
-        alert('Виникла помилка при відправці форми. Спробуйте пізніше');
-        console.log(error);
-    }
+const submitLead = async () =>{
+  if(!validate()) return;
+  try{
+    const response = await axios.post('http://localhost:8080/api/leads', lead)
+    message.value = 'Заявка успішно надіслана!'
+     lead.name = '';
+    lead.phone = '';
+    lead.typeOfWork = '';
+    lead.comment = '';
+  }catch(error: any){
+    message.value = 'Сталась помилка: ' + error.response?.data?.message || error.message;
+  }
 }
 </script>
 <template>
-    <form @submit.prevent="submitForm">
-        <input v-model="name" type="text" placeholder="Ваше імя" />
-        <input v-model="email" type="email" placeholder="Ваш email" />
-        <textarea v-model="message" placeholder="Ваше повідомлення"></textarea>
-        <button type="submit">Відправити</button>
-    </form>
+  <form @submit.prevent="submitLead">
+    <div>
+      <label for="name">Ім'я</label>
+      <input v-model="lead.name" id="name" required></input>
+      <div v-if="errors.name" style="color:red">{{ errors.name }}</div>
+    </div>
+    <div>
+      <label for="phone">Телефон</label>
+      <input v-model="lead.phone" id="phone" required></input>
+      <div v-if="errors.phone" style="color:red">{{ errors.phone }}</div>
+    </div>
+    <div>
+      <label>Тип роботи:</label>
+      <input v-model="lead.typeOfWork" id="TypeOfWork"></input>
+    </div>
+    <div>
+      <label>Коментар</label>
+      <textarea v-model="lead.comment" id="comment" required></textarea>
+    </div>
+
+    <button type="submit">Відправити</button>
+  </form>
+  <div v-if="message">
+{{ message }}
+  </div>
 </template>
+<style scoped></style>

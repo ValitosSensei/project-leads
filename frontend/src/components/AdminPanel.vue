@@ -10,6 +10,18 @@ onMounted(() => {
   leadStore.fetchLeads();
 })
 
+const nextPage = () => {
+  if (leadStore.currentPage + 1 < leadStore.totalPages) {
+    leadStore.fetchLeads(leadStore.currentPage + 1);
+  }
+}
+
+const prevPage = () => {
+  if (leadStore.currentPage > 0) {
+    leadStore.fetchLeads(leadStore.currentPage - 1);
+  }
+}
+
 const deleteLead = (id: number) => {
   if (confirm('Видалити цей лід?')) {
     leadStore.deleteLead(id)
@@ -24,9 +36,9 @@ const searchLeads = () => {
   });
 }
 
-const resetSearch = () =>{
+const resetSearch = () => {
   searchName.value = '';
-  searchType.value= '';
+  searchType.value = '';
   leadStore.fetchLeads();
 }
 </script>
@@ -62,5 +74,11 @@ const resetSearch = () =>{
         </tr>
       </tbody>
     </table>
+
+    <div>
+      <button @click="prevPage" :disabled="leadStore.currentPage === 0">Попередня</button>
+      <span>Сторінка {{ leadStore.currentPage + 1 }} з {{ leadStore.totalPages }}</span>
+      <button @click="nextPage" :disabled="leadStore.currentPage +1 === leadStore.totalPages">Наступна</button>
+    </div>
   </div>
 </template>

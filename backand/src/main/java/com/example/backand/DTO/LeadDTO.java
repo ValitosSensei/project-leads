@@ -26,6 +26,9 @@ public class LeadDTO {
     @Size(max = 2000)
     private String comment;
 
+    private LeadStatus status;
+    private String adminComment;
+
     private LocalDateTime createdAt;
 
 }

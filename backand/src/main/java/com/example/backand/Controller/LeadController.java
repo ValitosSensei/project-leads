@@ -2,6 +2,7 @@ package com.example.backand.Controller;
 
 import com.example.backand.DTO.Lead;
 import com.example.backand.DTO.LeadDTO;
+import com.example.backand.DTO.LeadStatus;
 import com.example.backand.Service.LeadService;
 import com.example.backand.Service.LeadServiceImpl;
 import jakarta.validation.Valid;
@@ -62,35 +63,15 @@ public class LeadController {
         return ResponseEntity.noContent().build();
     }
 
-    @GetMapping("/search")
+
+
+    @PatchMapping("/{id}/status")
     @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<Page<LeadDTO>> search(
-            @RequestParam(required = false) String name,
-            @RequestParam(required = false) String typeOfWork,
-            @RequestParam(required = false) String phone,
-            @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "10") int size
-    ){
-        Pageable pageable = PageRequest.of(page, size ,  Sort.by("createdAt").descending());
-
-        Page<LeadDTO> result;
-
-         if(name != null && typeOfWork != null){
-            result = leadService.searchByNameAndTypeOfWork(name,typeOfWork,pageable);
-        }
-        else if(name != null){
-            result = leadService.searchByName(name,pageable);
-        }
-        else if(phone != null){
-            result = leadService.searchByPhone(phone,pageable);
-        }
-        else if(typeOfWork != null){
-            result = leadService.searchByType(typeOfWork,pageable);
-        }
-        else{
-            result = leadService.getLeads(pageable);
-        }
-        return ResponseEntity.ok(result);
+    public ResponseEntity<LeadDTO> updateLeadStatus(
+            @PathVariable Long id,
+            @RequestParam LeadStatus status,
+            @RequestParam(required = false) String adminComment) {
+        return ResponseEntity.ok(leadService.updateStatusAndComment(id,status,adminComment));
     }
 
 

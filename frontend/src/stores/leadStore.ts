@@ -8,24 +8,43 @@ export interface Lead {
     typeOfWork?: string;
     comment?: string;
     createdAt: string;
+    status: string;
+    adminComment?: string;
 }
-
 
 export const useLeadStore = defineStore('leadStore', {
     state: () => ({
         leads: [] as Lead[],
-        currentPage:0,
-        totalPages:0
+        currentPage: 0,
+        totalPages: 0,
+        filters: {
+            name: '',
+            typeOfWork: '',
+            callStatus: '',
+            sortBy: 'createdAt',
+            sortDirection: 'DESC'
+        }
     }),
     actions: {
-        async fetchLeads(page = 0, size = 10) {
+        async fetchLeads(page = 0) {
             try {
-                     const response = await axios.get(`http://localhost:8080/api/leads?page=${page}&size=${size}`);
+                // Будемо відправляти тільки ті параметри, які реально заповнені
+                const params: any = { page, size: 10 };
+                
+                if (this.filters.name?.trim()) params.name = this.filters.name.trim();
+                if (this.filters.typeOfWork?.trim()) params.typeOfWork = this.filters.typeOfWork.trim();
+                if (this.filters.callStatus?.trim()) params.callStatus = this.filters.callStatus.trim();
+                
+                params.sortBy = this.filters.sortBy;
+                params.sortDirection = this.filters.sortDirection;
+
+                const response = await axios.get('http://localhost:8080/api/leads/search', { params });
+
                 this.leads = response.data.content;
+                this.currentPage = response.data.number;
                 this.totalPages = response.data.totalPages;
-                this.currentPage = response.data.number
             } catch (error) {
-                console.error('Помилка при отримані лідів', error);
+                console.error('Помилка при отриманні лідів', error);
             }
         },
         async deleteLead(id: number) {
@@ -36,19 +55,32 @@ export const useLeadStore = defineStore('leadStore', {
                 console.error('Помилка при видаленні ліда:', error);
             }
         },
-        async searchLeads(params: { name?: string; typeOfWork?: string }) {
+        setFilter(field: string, value: string) {
+            (this.filters as any)[field] = value;
+        },
+        resetFilters() {
+            this.filters = {
+                name: '',
+                typeOfWork: '',
+                callStatus: '',
+                sortBy: 'createdAt',
+                sortDirection: 'DESC'
+            };
+        },
+        async updateLead(id: number, status: string, adminComment: string) {
             try {
-                let query = new URLSearchParams();
-                if (params.name) query.append('name', params.name);
-                if (params.typeOfWork) query.append('typeOfWork', params.typeOfWork);
+                const response = await axios.patch(
+                    `http://localhost:8080/api/leads/${id}/status`,
+                    null,
+                    {
+                        params: { status, adminComment }
+                    }
+                );
 
-                const response = await axios.get(`http://localhost:8080/api/leads/search?${query.toString()}`);
-                this.leads = response.data.content;
-
-                this.currentPage = 0;
-                this.totalPages = 1;
+                const index = this.leads.findIndex(lead => lead.id === id);
+                if (index !== -1) this.leads[index] = response.data;
             } catch (error) {
-                console.error('Помилка при пошуку лідів:', error);
+                console.error('Помилка при оновленні ліда', error);
             }
         }
     }

@@ -1,10 +1,33 @@
 <script setup lang="ts">
 import { onMounted, ref } from 'vue';
-import { useLeadStore } from '../stores/leadStore';
+import { useLeadStore, type Lead } from '../stores/leadStore';
+import { WORK_TYPES } from '../constants/workTypes';
 
 const leadStore = useLeadStore();
 const searchName = ref('');
 const searchType = ref('');
+const searchStatus = ref('');
+const sortBy = ref('createdAt');
+const sortDirection = ref('DESC');
+
+const applyFilters = () => {
+  leadStore.setFilter('name', searchName.value);
+  leadStore.setFilter('typeOfWork', searchType.value);
+  leadStore.setFilter('callStatus', searchStatus.value);
+  leadStore.fetchLeads(0); // починаємо з першої сторінки
+}
+const resetAllFilters = () => {
+  searchName.value = '';
+  searchType.value = '';
+  searchStatus.value = '';
+  leadStore.resetFilters();
+  leadStore.fetchLeads(0);
+}
+const updateSorting = () => {
+  leadStore.setFilter('sortBy', sortBy.value);
+  leadStore.setFilter('sortDirection', sortDirection.value);
+  leadStore.fetchLeads(0);
+}
 
 onMounted(() => {
   leadStore.fetchLeads();
@@ -28,18 +51,22 @@ const deleteLead = (id: number) => {
   }
 }
 
-// Пошук через бекенд
-const searchLeads = () => {
-  leadStore.searchLeads({
-    name: searchName.value,
-    typeOfWork: searchType.value
-  });
-}
 
-const resetSearch = () => {
-  searchName.value = '';
-  searchType.value = '';
-  leadStore.fetchLeads();
+
+
+const updateLeadStatus = (lead: Lead) => {
+  leadStore.updateLead(lead.id, lead.status, lead.adminComment || '');
+};
+
+const formData = (isoString: string) =>{
+  return new Date(isoString).toLocaleDateString('uk-UA',{
+       year: 'numeric',
+    month: '2-digit',
+    day: '2-digit',
+    hour: '2-digit',
+    minute: '2-digit',
+    second: '2-digit',
+  })
 }
 </script>
 
@@ -47,10 +74,33 @@ const resetSearch = () => {
   <div>
     <h2>Адмінпанель лідів</h2>
 
-    <input v-model="searchName" placeholder="Пошук по імені" />
-    <input v-model="searchType" placeholder="Пошук по типу роботи" />
-    <button @click="searchLeads">Пошук</button>
-    <button @click="resetSearch">Скинути</button>
+    <div>
+      <input v-model="searchName" placeholder="Пошук по імені" />
+      <select v-model="searchType">
+        <option value="">Всі типи роботи</option>
+        <option v-for="type in WORK_TYPES" :key="type" :value="type">{{ type }}</option>
+      </select>
+      <select v-model="searchStatus">
+        <option value="">Всі статуси</option>
+        <option value="NEW">NEW</option>
+        <option value="CALLED">CALLED</option>
+        <option value="NO_ANSWER"> NO_ANSWER</option>
+        <option value="INVALID_DATA">INVALID_DATA</option>
+      </select>
+      <button @click="applyFilters">Застосувати</button>
+      <button @click="resetAllFilters">Скинути</button>
+      <div>
+        <label>Сортування:</label>
+        <select v-model="sortBy" @change="updateSorting">
+          <option value="createdAt">Дата створення</option>
+          <option value="name">Ім’я</option>
+        </select>
+        <select v-model="sortDirection" @change="updateSorting">
+          <option value="ASC">Зростання</option>
+          <option value="DESC">Спадання</option>
+        </select>
+      </div>
+    </div>
 
     <table border="1">
       <thead>
@@ -69,8 +119,17 @@ const resetSearch = () => {
           <td>{{ lead.phone }}</td>
           <td>{{ lead.typeOfWork }}</td>
           <td>{{ lead.comment }}</td>
-          <td>{{ lead.createdAt }}</td>
-          <td><button @click="deleteLead(lead.id)">Видалити</button></td>
+          <td>{{ formData(lead.createdAt) }}</td>
+          <td>
+            <select v-model="lead.status" @change="updateLeadStatus(lead)">
+              <option value="NEW">NEW</option>
+              <option value="CALLED">CALLED</option>
+              <option value="NO_ANSWER"> NO_ANSWER</option>
+              <option value="INVALID_DATA">INVALID_DATA</option>
+            </select>
+            <textarea v-model="lead.adminComment" @blur="updateLeadStatus(lead)"></textarea>
+            <button @click="deleteLead(lead.id)">Видалити</button>
+          </td>
         </tr>
       </tbody>
     </table>
@@ -78,7 +137,7 @@ const resetSearch = () => {
     <div>
       <button @click="prevPage" :disabled="leadStore.currentPage === 0">Попередня</button>
       <span>Сторінка {{ leadStore.currentPage + 1 }} з {{ leadStore.totalPages }}</span>
-      <button @click="nextPage" :disabled="leadStore.currentPage +1 === leadStore.totalPages">Наступна</button>
+      <button @click="nextPage" :disabled="leadStore.currentPage + 1 === leadStore.totalPages">Наступна</button>
     </div>
   </div>
 </template>

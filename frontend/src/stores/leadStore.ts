@@ -14,12 +14,16 @@ export interface Lead {
 export const useLeadStore = defineStore('leadStore', {
     state: () => ({
         leads: [] as Lead[],
+        currentPage:0,
+        totalPages:0
     }),
     actions: {
-        async fetchLeads() {
+        async fetchLeads(page = 0, size = 10) {
             try {
-                const response = await axios.get('http://localhost:8080/api/leads');
+                     const response = await axios.get(`http://localhost:8080/api/leads?page=${page}&size=${size}`);
                 this.leads = response.data.content;
+                this.totalPages = response.data.totalPages;
+                this.currentPage = response.data.number
             } catch (error) {
                 console.error('Помилка при отримані лідів', error);
             }
@@ -40,6 +44,9 @@ export const useLeadStore = defineStore('leadStore', {
 
                 const response = await axios.get(`http://localhost:8080/api/leads/search?${query.toString()}`);
                 this.leads = response.data.content;
+
+                this.currentPage = 0;
+                this.totalPages = 1;
             } catch (error) {
                 console.error('Помилка при пошуку лідів:', error);
             }

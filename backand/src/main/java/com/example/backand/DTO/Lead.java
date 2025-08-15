@@ -4,6 +4,8 @@ import jakarta.persistence.*;
 import lombok.*;
 
 import java.time.LocalDateTime;
+import java.util.HashSet;
+import java.util.Set;
 
 @Entity
 @Table(name = "leads")
@@ -35,6 +37,10 @@ public class Lead {
 
     @Column(length = 2000)
     private String adminComment;
+
+    @ElementCollection
+    @Enumerated(EnumType.STRING)
+    private Set<ContactMethod> contactMethods = new HashSet<>();
 
     @PrePersist
     public void prePersist() {

@@ -1,5 +1,6 @@
 package com.example.backand;
 
+import com.example.backand.DTO.ContactMethod;
 import com.example.backand.DTO.Lead;
 import com.example.backand.DTO.LeadStatus;
 import com.example.backand.Repository.LeadRepository;
@@ -25,6 +26,7 @@ public class LeadDataLoader implements CommandLineRunner {
                         .typeOfWork(i % 2 == 0 ? "Курсова" : "Дипломна")
                         .comment("Автоматично створений лід #" + i)
                         .status(LeadStatus.NEW)
+                       
                         .build();
                 leadRepository.save(lead);
             }

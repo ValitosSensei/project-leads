@@ -30,6 +30,12 @@ public class Lead {
 
     private LocalDateTime createdAt;
 
+    @Enumerated(EnumType.STRING)
+    private LeadStatus status = LeadStatus.NEW;
+
+    @Column(length = 2000)
+    private String adminComment;
+
     @PrePersist
     public void prePersist() {
         this.createdAt = LocalDateTime.now();

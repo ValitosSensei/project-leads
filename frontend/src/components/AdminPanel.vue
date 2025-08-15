@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { onMounted, ref } from 'vue';
-import { useLeadStore } from '../stores/leadStore';
+import { useLeadStore, type Lead } from '../stores/leadStore';
 
 const leadStore = useLeadStore();
 const searchName = ref('');
@@ -41,6 +41,10 @@ const resetSearch = () => {
   searchType.value = '';
   leadStore.fetchLeads();
 }
+
+const updateLeadStatus = (lead: Lead) => {
+  leadStore.updateLead(lead.id, lead.status, lead.adminComment || '');
+};
 </script>
 
 <template>
@@ -70,7 +74,16 @@ const resetSearch = () => {
           <td>{{ lead.typeOfWork }}</td>
           <td>{{ lead.comment }}</td>
           <td>{{ lead.createdAt }}</td>
-          <td><button @click="deleteLead(lead.id)">Видалити</button></td>
+          <td>
+            <select v-model="lead.status" @change="updateLeadStatus(lead)">
+              <option value="NEW">NEW</option>
+              <option value="CALLED">CALLED</option>
+              <option value="NO_ANSWER"> NO_ANSWER</option>
+              <option value="INVALID_DATA">INVALID_DATA</option>
+            </select>
+            <textarea v-model="lead.adminComment" @blur="updateLeadStatus(lead)"></textarea>
+            <button @click="deleteLead(lead.id)">Видалити</button>
+          </td>
         </tr>
       </tbody>
     </table>

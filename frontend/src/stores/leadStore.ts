@@ -8,19 +8,21 @@ export interface Lead {
     typeOfWork?: string;
     comment?: string;
     createdAt: string;
+    status: string;
+    adminComment?: string;
 }
 
 
 export const useLeadStore = defineStore('leadStore', {
     state: () => ({
         leads: [] as Lead[],
-        currentPage:0,
-        totalPages:0
+        currentPage: 0,
+        totalPages: 0
     }),
     actions: {
         async fetchLeads(page = 0, size = 10) {
             try {
-                     const response = await axios.get(`http://localhost:8080/api/leads?page=${page}&size=${size}`);
+                const response = await axios.get(`http://localhost:8080/api/leads?page=${page}&size=${size}`);
                 this.leads = response.data.content;
                 this.totalPages = response.data.totalPages;
                 this.currentPage = response.data.number
@@ -49,6 +51,25 @@ export const useLeadStore = defineStore('leadStore', {
                 this.totalPages = 1;
             } catch (error) {
                 console.error('Помилка при пошуку лідів:', error);
+            }
+        },
+
+        async updateLead(id: number, status: string, adminComment: string) {
+            try {
+                // Другий аргумент null, бо тіло PATCH не потрібне
+                const response = await axios.patch(`http://localhost:8080/api/leads/${id}/status`, null, {
+                    params: {
+                        status: status,
+                        adminComment: adminComment
+                    }
+                });
+
+                const index = this.leads.findIndex(lead => lead.id === id);
+                if (index !== -1) {
+                    this.leads[index] = response.data;
+                }
+            } catch (error) {
+                console.error('Помилка при оновленні ліда', error);
             }
         }
     }

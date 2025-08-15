@@ -84,13 +84,13 @@ public class LeadServiceImpl  implements  LeadService{
     public Page<LeadDTO> searchLead(LeadSearchRequestDTO searchRequestDTO, Pageable pageable) {
         Specification<Lead> spec = null;
 
-        if (searchRequestDTO.getName() != null) {
+        if (searchRequestDTO.getName() != null && !searchRequestDTO.getName().isBlank()) {
             spec = combine(spec, LeadSpecification.hasName(searchRequestDTO.getName()));
         }
-        if (searchRequestDTO.getTypeOfWork() != null) {
+        if (searchRequestDTO.getTypeOfWork() != null && !searchRequestDTO.getTypeOfWork().isBlank()) {
             spec = combine(spec, LeadSpecification.hasWorkType(searchRequestDTO.getTypeOfWork()));
         }
-        if (searchRequestDTO.getCallStatus() != null) {
+        if (searchRequestDTO.getCallStatus() != null&& !searchRequestDTO.getCallStatus().isBlank()) {
             spec = combine(spec, LeadSpecification.hasCallStatus(searchRequestDTO.getCallStatus()));
         }
 
@@ -114,7 +114,9 @@ public class LeadServiceImpl  implements  LeadService{
         l.setPhone(dto.getPhone());
         l.setTypeOfWork(dto.getTypeOfWork());
         l.setComment(dto.getComment());
-        l.setStatus(dto.getStatus());
+       if(dto.getStatus()!=null){
+           l.setStatus(dto.getStatus());
+       }
         l.setAdminComment(dto.getAdminComment());
         return l;
     }

@@ -1,9 +1,6 @@
 package com.example.backand.Service;
 
-import com.example.backand.DTO.Lead;
-import com.example.backand.DTO.LeadDTO;
-import com.example.backand.DTO.LeadSearchRequestDTO;
-import com.example.backand.DTO.LeadStatus;
+import com.example.backand.DTO.*;
 import com.example.backand.Repository.LeadRepository;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,6 +11,10 @@ import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.Set;
+import java.util.stream.Collectors;
+
 
 @Service
 public class LeadServiceImpl  implements  LeadService{
@@ -109,14 +110,24 @@ public class LeadServiceImpl  implements  LeadService{
 
     //Мапування дто в ліда
     private Lead mapToEntity(LeadDTO dto) {
-        Lead l =  new Lead();
+        Lead l = new Lead();
         l.setName(dto.getName());
         l.setPhone(dto.getPhone());
         l.setTypeOfWork(dto.getTypeOfWork());
         l.setComment(dto.getComment());
-       if(dto.getStatus()!=null){
-           l.setStatus(dto.getStatus());
-       }
+
+        if(dto.getStatus() != null){
+            l.setStatus(dto.getStatus());
+        }
+
+        // 🔹 Перетворюємо рядки з DTO у Enum ContactMethod
+        if(dto.getContactMethods() != null) {
+            Set<ContactMethod> methods = dto.getContactMethods().stream()
+                    .map(ContactMethod::valueOf) // "PHONE" -> ContactMethod.PHONE
+                    .collect(Collectors.toSet());
+            l.setContactMethods(methods);
+        }
+
         l.setAdminComment(dto.getAdminComment());
         return l;
     }
@@ -130,6 +141,14 @@ public class LeadServiceImpl  implements  LeadService{
         dto.setComment(lead.getComment());
         dto.setCreatedAt(lead.getCreatedAt());
         dto.setStatus(lead.getStatus());
+        if(lead.getContactMethods() != null) {
+            Set<String> methods = lead.getContactMethods()
+                    .stream()
+                    .map(Enum::name) // ContactMethod.PHONE -> "PHONE"
+                    .collect(Collectors.toSet());
+            dto.setContactMethods(methods);
+        }
+
         dto.setAdminComment(lead.getAdminComment());
         return dto;
     }

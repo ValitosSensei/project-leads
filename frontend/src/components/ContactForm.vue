@@ -1,27 +1,32 @@
 <script setup lang="ts">
 import axios from 'axios';
 import { reactive, ref } from 'vue';
-import { WORK_TYPES } from '../constants/workTypes';
+import { CONTACT_METHODS, WORK_TYPES } from '../constants/workTypes';
 
-interface LeadDTO{
-  name:string;
-  phone:string;
-  typeOfWork?:string;
-  comment?:string;
+
+
+interface LeadDTO {
+  name: string;
+  phone: string;
+  typeOfWork?: string;
+  comment?: string;
+  contactMethods: string[]; // ✅ масив
 }
 
 const form = reactive<LeadDTO>({
   name: '',
   phone: '',
   typeOfWork: '',
-  comment: ''
+  comment: '',
+  contactMethods: [] // масив, а не рядок
 })
 
 const errors = reactive({
   name: '',
   phone: '',
   typeOfWork: '',
-  comment: ''
+  comment: '',
+  contactMethods: '',
 });
 
 const validateForm = () => {
@@ -46,17 +51,18 @@ const validateForm = () => {
   return isValid
 }
 
-const submitLead = async () =>{
-  
-  if(!validateForm()) return;
-  try{
+const submitLead = async () => {
+
+  if (!validateForm()) return;
+  try {
     const response = await axios.post('http://localhost:8080/api/leads', form)
     alert('Форма відправлена')
-     form.name = '';
+    form.name = '';
     form.phone = '';
     form.typeOfWork = '';
     form.comment = '';
-  }catch(error: any){
+    form.contactMethods = [];
+  } catch (error: any) {
     alert('Сталась помилка: ' + error.response?.data?.message || error.message);
   }
 }
@@ -80,13 +86,19 @@ const submitLead = async () =>{
         <option v-for="type in WORK_TYPES" :key="type" :value="type">
           {{ type }}
         </option>
-        
+
       </select>
-    <p v-if="errors.typeOfWork" style="color: red;">{{ errors.typeOfWork }}</p>
+      <p v-if="errors.typeOfWork" style="color: red;">{{ errors.typeOfWork }}</p>
     </div>
     <div>
       <label>Коментар</label>
       <textarea v-model="form.comment" id="comment" required></textarea>
+    </div>
+    <div>
+      <label>Як з вами зв’язатися?</label>
+      <div v-for="method in CONTACT_METHODS" :key="method">
+        <input type="checkbox" :value="method" v-model="form.contactMethods" /> {{ method }}
+      </div>
     </div>
     <button type="submit">Відправити</button>
   </form>

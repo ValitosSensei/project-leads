@@ -58,9 +58,9 @@ const updateLeadStatus = (lead: Lead) => {
   leadStore.updateLead(lead.id, lead.status, lead.adminComment || '');
 };
 
-const formData = (isoString: string) =>{
-  return new Date(isoString).toLocaleDateString('uk-UA',{
-       year: 'numeric',
+const formData = (isoString: string) => {
+  return new Date(isoString).toLocaleDateString('uk-UA', {
+    year: 'numeric',
     month: '2-digit',
     day: '2-digit',
     hour: '2-digit',
@@ -68,6 +68,11 @@ const formData = (isoString: string) =>{
     second: '2-digit',
   })
 }
+const CONTACT_ICONS: Record<string, string> = {
+  PHONE: '📞',
+  TELEGRAM: '✈️',
+  VIBER: '📱'
+};
 </script>
 
 <template>
@@ -120,6 +125,13 @@ const formData = (isoString: string) =>{
           <td>{{ lead.typeOfWork }}</td>
           <td>{{ lead.comment }}</td>
           <td>{{ formData(lead.createdAt) }}</td>
+          <td>
+            <span v-for="(method, index) in lead.contactMethods" :key="index"
+              style="display: inline-flex; align-items: center; margin-right: 10px;">
+              <span style="margin-right: 3px;">{{ CONTACT_ICONS[method] || '' }}</span>
+              <span>{{ method }}</span>
+            </span>
+          </td>
           <td>
             <select v-model="lead.status" @change="updateLeadStatus(lead)">
               <option value="NEW">NEW</option>

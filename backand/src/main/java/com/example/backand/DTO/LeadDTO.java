@@ -1,5 +1,6 @@
 package com.example.backand.DTO;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
 import lombok.Data;
@@ -7,6 +8,8 @@ import lombok.Getter;
 import lombok.Setter;
 
 import java.time.LocalDateTime;
+import java.util.HashSet;
+import java.util.Set;
 
 @Data
 public class LeadDTO {
@@ -28,6 +31,9 @@ public class LeadDTO {
 
     private LeadStatus status;
     private String adminComment;
+
+    @JsonProperty("contactMethods")
+    private Set<String> contactMethods = new HashSet<>();
 
     private LocalDateTime createdAt;
 

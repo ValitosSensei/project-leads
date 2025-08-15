@@ -10,6 +10,7 @@ export interface Lead {
     createdAt: string;
     status: string;
     adminComment?: string;
+    contactMethods:string[];
 }
 
 export const useLeadStore = defineStore('leadStore', {

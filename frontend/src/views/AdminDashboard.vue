@@ -1,6 +1,6 @@
 <script setup lang="ts">
 
-import AdminPanel from '../components/AdminPanel.vue';
+import AdminPanel from './AdminPanel.vue';
 import { useAuthStore } from '../stores/authStore';
 import { useRouter } from 'vue-router';
 

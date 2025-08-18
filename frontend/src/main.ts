@@ -30,7 +30,7 @@ axios.interceptors.response.use(
   error => {
     if (error.response?.status === 401 || error.response?.status === 403) {
       authStore.logout()          // очищаємо токен
-      router.push('/login')       // редірект на логін
+      router.push('/admin-login')       // редірект на логін
     }
     return Promise.reject(error)
   }

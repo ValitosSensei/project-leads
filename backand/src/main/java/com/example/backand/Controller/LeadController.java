@@ -49,7 +49,7 @@ public class LeadController {
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<Page<LeadDTO>> list(
             @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "10") int size
+            @RequestParam(defaultValue = "20") int size
     ){
         Pageable pageable = PageRequest.of(page, size, Sort.by("createdAt").descending());
         Page<LeadDTO> leads = leadService.getLeads(pageable);
@@ -89,7 +89,7 @@ public class LeadController {
             @RequestParam(defaultValue = "createdAt") String sortBy,
             @RequestParam(defaultValue = "DESC") String sortDirection,
             @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "10") int size
+            @RequestParam(defaultValue = "20") int size
     ) {
         LeadSearchRequestDTO dto = new LeadSearchRequestDTO();
         dto.setName(name);

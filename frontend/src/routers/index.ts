@@ -18,7 +18,7 @@ const router = createRouter({
 });
 
 // **Навігаційний guard**
-router.beforeEach((to, from, next) => {
+router.beforeEach((to, _from, next) => {
   const authStore = useAuthStore();
   if (to.meta.requiresAuth && !authStore.isAuthenticated) {
     next('/admin-login'); // редірект на логін, якщо не авторизований

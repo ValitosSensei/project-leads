@@ -29,8 +29,8 @@
 ## Структура проєкту
 
 project-leads/
--│
--├─ frontend/ # Vue.js додаток
--├─ backend/ # Spring Boot сервер
--├─ .gitignore # Файли для ігнорування Git
--└─ README.md # Документація проєкту
+- │
+- ├─ frontend/ # Vue.js додаток
+- ├─ backend/ # Spring Boot сервер
+- ├─ .gitignore # Файли для ігнорування Git
+- └─ README.md # Документація проєкту

@@ -61,11 +61,6 @@ const formData = (isoString: string) => {
   })
 }
 
-const CONTACT_ICONS: Record<string, string> = {
-  PHONE: '📞',
-  TELEGRAM: '✈️',
-  VIBER: '📱'
-};
 
 const selectedLead = ref<Lead | null>(null);
 const showPopup = ref(false);
@@ -96,7 +91,7 @@ const saveLeadDetails = () => {
 <template>
   <div class="admin-container">
     <h2>Адмінпанель лідів</h2>
-
+    <div class="content-wrapper">
     <div class="filters">
       <input v-model="searchName" placeholder="Пошук по імені" />
       <select v-model="searchType">
@@ -110,8 +105,8 @@ const saveLeadDetails = () => {
         <option value="NO_ANSWER">NO_ANSWER</option>
         <option value="INVALID_DATA">INVALID_DATA</option>
       </select>
-      <button @click="applyFilters">Застосувати</button>
-      <button @click="resetAllFilters">Скинути</button>
+      <button @click="applyFilters" class="details-btn">Застосувати</button>
+      <button @click="resetAllFilters" class="details-btn">Скинути</button>
     </div>
 
     <div class="sorting">
@@ -158,9 +153,9 @@ const saveLeadDetails = () => {
     </table>
 
     <div class="pagination">
-      <button @click="prevPage" :disabled="leadStore.currentPage === 0">Попередня</button>
+      <button @click="prevPage" :disabled="leadStore.currentPage === 0" class="details-btn">Попередня</button>
       <span>Сторінка {{ leadStore.currentPage + 1 }} з {{ leadStore.totalPages }}</span>
-      <button @click="nextPage" :disabled="leadStore.currentPage + 1 === leadStore.totalPages">Наступна</button>
+      <button @click="nextPage" :disabled="leadStore.currentPage + 1 === leadStore.totalPages" class="details-btn">Наступна</button>
     </div>
   </div>
 
@@ -174,27 +169,29 @@ const saveLeadDetails = () => {
       <p><b>Коментар користувача:</b> {{ selectedLead?.comment }}</p>
       <p><b>Дата створення:</b> {{ selectedLead ? formData(selectedLead.createdAt) : '' }}</p>
 
-      <div>
-        <label>Статус:</label>
-        <select v-model="selectedLead!.status">
-          <option value="NEW">NEW</option>
-          <option value="CALLED">CALLED</option>
-          <option value="NO_ANSWER">NO_ANSWER</option>
-          <option value="INVALID_DATA">INVALID_DATA</option>
-        </select>
-      </div>
+      <div class="form-group">
+  <label>Статус:</label>
+  <select v-model="selectedLead!.status">
+    <option value="NEW">NEW</option>
+    <option value="CALLED">CALLED</option>
+    <option value="NO_ANSWER">NO_ANSWER</option>
+    <option value="INVALID_DATA">INVALID_DATA</option>
+  </select>
+</div>
 
-      <div>
-        <label>Коментар адміна:</label>
-        <textarea v-model="selectedLead!.adminComment"></textarea>
-      </div>
+<div class="form-group">
+  <label>Коментар адміна:</label>
+  <textarea v-model="selectedLead!.adminComment"></textarea>
+</div>
 
-      <div>
-        <label>Методи контакту:</label>
-        <label><input type="checkbox" value="PHONE" v-model="selectedLead!.contactMethods" /> Дзвінок</label>
-        <label><input type="checkbox" value="TELEGRAM" v-model="selectedLead!.contactMethods" /> Telegram</label>
-        <label><input type="checkbox" value="VIBER" v-model="selectedLead!.contactMethods" /> Viber</label>
-      </div>
+<div class="form-group">
+  <label>Методи контакту:</label>
+  <div class="checkbox-group">
+    <label><input type="checkbox" value="PHONE" v-model="selectedLead!.contactMethods" /> Дзвінок</label>
+    <label><input type="checkbox" value="TELEGRAM" v-model="selectedLead!.contactMethods" /> Telegram</label>
+    <label><input type="checkbox" value="VIBER" v-model="selectedLead!.contactMethods" /> Viber</label>
+  </div>
+</div>
 
       <div class="modal-actions">
         <button @click="saveLeadDetails">Зберегти</button>
@@ -202,15 +199,34 @@ const saveLeadDetails = () => {
         <button @click="closePopup">Закрити</button>
       </div>
     </div>
+    </div>
   </div>
 </template>
 
 <style scoped>
+
 .admin-container {
-  padding: 15px;
+  padding: 20px;
   font-family: system-ui, sans-serif;
   color: #fff;
-  background-color: #333;
+  background-color: #2c2c2c;
+  min-height: 100vh;
+
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+/* Центруємо контент і робимо max-width */
+.content-wrapper {
+ 
+  width: 100%;
+  max-width: 100%;
+}
+
+h2 {
+  text-align: center;
+  margin-bottom: 20px;
 }
 
 .filters, .sorting {
@@ -218,13 +234,13 @@ const saveLeadDetails = () => {
   gap: 10px;
   margin-bottom: 15px;
   flex-wrap: wrap;
+  justify-content: center;
 }
 
 .filters input, .filters select, .sorting select {
   padding: 8px;
   border-radius: 5px;
   border: none;
-  
 }
 
 .leads-table {
@@ -232,11 +248,14 @@ const saveLeadDetails = () => {
   border-collapse: collapse;
   margin-bottom: 15px;
   font-size: 14px;
+  background: #3b3b3b;
+  border-radius: 8px;
+  overflow: hidden;
 }
 
 .leads-table th, .leads-table td {
   border: 1px solid #555;
-  padding: 6px 8px;
+  padding: 8px 10px;
   text-align: left;
 }
 
@@ -245,18 +264,11 @@ const saveLeadDetails = () => {
 }
 
 .leads-table tr:nth-child(even) {
-  background-color: #3b3b3b;
+  background-color: #363636;
 }
 
 .leads-table tr:hover {
   background-color: #555;
-}
-
-textarea {
-  width: 100%;
-  resize: vertical;
-  border-radius: 5px;
-  margin-top: 5px;
 }
 
 .details-btn {
@@ -294,8 +306,8 @@ textarea {
 
 .modal-content {
   background: #444;
-  padding: 15px;
-  border-radius: 8px;
+  padding: 20px;
+  border-radius: 10px;
   width: 100%;
   max-width: 480px;
 }
@@ -316,8 +328,12 @@ textarea {
   flex: 1 1 auto;
 }
 
-/* Адаптація під мобільні */
 @media (max-width: 768px) {
+  .filters, .sorting {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
   .leads-table th:nth-child(3),
   .leads-table th:nth-child(4),
   .leads-table th:nth-child(5),
@@ -327,16 +343,12 @@ textarea {
     display: none;
   }
 
-  .filters, .sorting {
-    flex-direction: column;
-  }
-
   .details-btn {
     width: 100%;
   }
 
   .modal-content {
-    padding: 10px;
+    padding: 15px;
   }
 
   .modal-actions {
@@ -344,30 +356,56 @@ textarea {
   }
 }
 
-.pagination {
+
+
+
+.modal-content h3 {
+  margin-top: 0;
+  margin-bottom: 15px;
+}
+
+.modal-content p {
+  margin: 6px 0;
+}
+
+.modal-content .form-group {
   display: flex;
-  justify-content: center;
-  align-items: center;
-  gap: 8px;
-  margin-top: 10px;
+  flex-direction: column;
+  margin: 12px 0;
+}
+
+.modal-content label {
+  margin-bottom: 6px;
+  font-weight: bold;
+  font-size: 14px;
+}
+
+.modal-content select,
+.modal-content textarea,
+.modal-content input[type="text"] {
+  padding: 8px;
+  border-radius: 6px;
+  border: none;
+  background: #555;
+  color: #fff;
+}
+
+.modal-content textarea {
+  resize: vertical;
+  min-height: 80px;
+}
+
+.modal-content .checkbox-group {
+  display: flex;
+  gap: 12px;
+  margin-top: 6px;
   flex-wrap: wrap;
 }
 
-@media (max-width: 768px) {
-  .pagination {
-    flex-direction: column;
-    gap: 5px;
-  }
-
-  .pagination button {
-    width: 100%;
-    padding: 8px 0;
-    font-size: 14px;
-  }
-
-  .pagination span {
-    text-align: center;
-    width: 100%;
-  }
+.modal-content .checkbox-group label {
+  font-weight: normal;
+  display: flex;
+  align-items: center;
+  gap: 4px;
 }
 </style>
